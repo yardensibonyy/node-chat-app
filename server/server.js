@@ -16,8 +16,18 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
-    //socket.on lets us setup event handlers for the individual socket
-    socket.on('disconnect', (socket) => {
+
+    socket.emit('newMessage', {
+        from: "somwone",
+        text: 'Hey. How are you?',
+        createdAt: 456
+    });
+
+    socket.on('createMessage', (newMessage) => {
+        console.log('createEmail', newMessage);
+    });
+    
+    socket.on('disconnect', (socket) => { //socket.on lets us setup event handlers for the individual socket
         console.log('User disconnected');
     });
 });
