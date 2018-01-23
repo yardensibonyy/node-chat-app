@@ -17,14 +17,15 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.emit('newMessage', {
-        from: "somwone",
-        text: 'Hey. How are you?',
-        createdAt: 456
-    });
-
+    //socket.emit fires event to specific connection
+    //on.emit fires event to all connections
     socket.on('createMessage', (newMessage) => {
         console.log('createEmail', newMessage);
+        io.emit('newMessage', {
+            from: newMessage.from,
+            text: newMessage.text,
+            createdAt: new Date().getTime()
+        });
     });
     
     socket.on('disconnect', (socket) => { //socket.on lets us setup event handlers for the individual socket
