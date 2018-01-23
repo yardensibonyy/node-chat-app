@@ -17,8 +17,17 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    //socket.emit fires event to specific connection
-    //on.emit fires event to all connections
+    socket.emit('newMessage', { //socket.emit is to specific connection
+        from: 'Admin',
+        text: 'Welcoom the the chat app',
+        createdAt: new Date().getTime()
+    });
+    socket.broadcast.emit('newMessage', { //socket.broadcast.emit is to all connections
+        from: 'Admin',
+        text: 'Someone just joined the chat',
+        createdAt: new Date().getTime()
+    });
+    
     socket.on('createMessage', (newMessage) => {
         console.log('createEmail', newMessage);
         io.emit('newMessage', {
@@ -27,7 +36,7 @@ io.on('connection', (socket) => {
             createdAt: new Date().getTime()
         });
     });
-    
+
     socket.on('disconnect', (socket) => { //socket.on lets us setup event handlers for the individual socket
         console.log('User disconnected');
     });
