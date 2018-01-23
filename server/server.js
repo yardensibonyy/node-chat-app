@@ -3,6 +3,7 @@ const http = require('http');
 var express = require('express');
 const socketIO = require('socket.io');
 
+const {generateMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
 const app = express();
@@ -17,24 +18,15 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.emit('newMessage', { //socket.emit is to specific connection
-        from: 'Admin',
-        text: 'Welcoom the the chat app',
-        createdAt: new Date().getTime()
-    });
-    socket.broadcast.emit('newMessage', { //socket.broadcast.emit is to all connections
-        from: 'Admin',
-        text: 'Someone just joined the chat',
-        createdAt: new Date().getTime()
-    });
-    
+    //socket.emit is to specific connection
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app')); 
+
+    //socket.broadcast.emit is to all connections accept that specific socket
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'Someone just joined the chat'));  
+     
     socket.on('createMessage', (newMessage) => {
         console.log('createEmail', newMessage);
-        io.emit('newMessage', {
-            from: newMessage.from,
-            text: newMessage.text,
-            createdAt: new Date().getTime()
-        });
+        io.emit('newMessage', generateMessage(newMessage.from, newMessage.text))
     });
 
     socket.on('disconnect', (socket) => { //socket.on lets us setup event handlers for the individual socket
