@@ -12,17 +12,30 @@ function scrollToBottom () {
     let newMessageHeight = newMessage.innerHeight();
     let lastMessageHeight = newMessage.prev().innerHeight();
 
-    if(clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
         messages.scrollTop(scrollHeight);
     }
 }
 
 socket.on('connect', function () {
-    console.log('Connected to server');
+    let params = jQuery.deparam(window.location.search);
+    
+    socket.emit('join', params, function(err) {
+        if (err) {
+            alert(err);
+            window.location.href = '/';
+        } else {
+            console.log('No errors.');
+        }
+    });
 });
 
 socket.on('disconnect', function () {
     console.log('Disconnected from server');
+});
+
+socket.on('updateUserList', function (users) {
+    console.log('users', users);
 });
 
 socket.on('newMessage', function (message) {
@@ -38,7 +51,7 @@ socket.on('newMessage', function (message) {
     scrollToBottom();
 });
 
-socket.on('newLocationMessage', (message) => {
+socket.on('newLocationMessage', function (message)  {
     let formattedMoment = moment(message.createdAt).format('h:mm a');
     let template = jQuery('#location-message-template').html(); //.html()-> parse it from object to string so it can be render via mustache
     let html = Mustache.render(template, {
