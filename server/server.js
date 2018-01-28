@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
         if (user && isRealString(newMessage.text)) {
             io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));
         }
-        callback();
+        callback(); //sets text box to empty string
     });
 
     socket.on('createLocationMessage', (coords) => {
