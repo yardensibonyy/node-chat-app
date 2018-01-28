@@ -27,6 +27,12 @@ io.on('connection', (socket) => {
         if (!isRealString(params.name) || !isRealString(params.room)) {
             return callback('Name and room name are required.');
         }
+        let userList = users.getUserList(params.room);
+        userList.forEach((user) => {
+            if (params.name === user) {
+                return callback('Name is already taken in this room. Please chose another.');
+            }
+        });
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
