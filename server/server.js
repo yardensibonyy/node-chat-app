@@ -27,14 +27,13 @@ io.on('connection', (socket) => {
         if (!isRealString(params.name) || !isRealString(params.room)) {
             return callback('Name and room name are required.');
         }
-
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
 
-        //io.emit is to all the connections
-        //socket.emit is to specific connection
-        //socket.broadcast.emit is to all the connections accept that specific socket
+        //io.emit fires to all the connections
+        //socket.emit fires to specific connection
+        //socket.broadcast.emit fires to all the connections accept that specific socket
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app')); 
         socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));  
@@ -51,7 +50,7 @@ io.on('connection', (socket) => {
         io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 
-    socket.on('disconnect', (socket) => { 
+    socket.on('disconnect', () => { 
         let user = users.removeUser(socket.id);
         if (user) {
             io.to(user.room).emit('updateUserList', users.getUserList(user.room));
